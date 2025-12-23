@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset ID to ERC20 Address Converter</title>
+    <script src="https://cdn.jsdelivr.net/npm/js-sha3@0.9.2/src/sha3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            background: #151515;
+            border-radius: 2px;
+            border: 1px solid #2a2a2a;
+            padding: 48px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: #999999;
+            margin-bottom: 40px;
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .input-group {
+            margin-bottom: 32px;
+        }
+
+        label {
+            display: block;
+            color: #cccccc;
+            font-weight: 500;
+            margin-bottom: 10px;
+            font-size: 14px;
+            letter-spacing: 0.01em;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #2a2a2a;
+            border-radius: 2px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #ffffff;
+            background: #1a1a1a;
+        }
+
+        .results {
+            margin-top: 32px;
+        }
+
+        .result-item {
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 2px;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #cccccc;
+            margin-bottom: 12px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .result-address {
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 15px;
+            color: #ffffff;
+            word-break: break-all;
+            background: #1a1a1a;
+            padding: 14px;
+            border: 1px solid #2a2a2a;
+            border-radius: 2px;
+            line-height: 1.6;
+        }
+
+        .copy-btn {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 12px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            min-width: 120px;
+        }
+
+        .copy-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .copy-btn:active {
+            background: #ffffff;
+            transform: scale(0.98);
+        }
+
+        .info-box {
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            padding: 24px;
+            margin-top: 40px;
+            border-radius: 2px;
+        }
+
+        .info-box h3 {
+            color: #ffffff;
+            margin-bottom: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .info-box p {
+            color: #cccccc;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .info-box code {
+            background: #1a1a1a;
+            padding: 3px 8px;
+            border-radius: 2px;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            color: #ffffff;
+            font-size: 13px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 32px 24px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .result-address {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Asset ID to ERC20 Address Converter</h1>
+        <p class="subtitle">Convert assets in the assets pallet to ERC20 precompile addresses</p>
+
+        <div class="input-group">
+            <label for="assetId">Asset ID (Decimal)</label>
+            <input
+                type="number"
+                id="assetId"
+                placeholder="Enter asset ID (e.g., 50000281)"
+                value="50000281"
+                min="0"
+                max="4294967295"
+            >
+        </div>
+
+        <div id="results" class="results hidden">
+            <div class="result-item">
+                <div class="result-label">ERC20 Precompile Address</div>
+                <div class="result-address" id="correctAddress"></div>
+                <button class="copy-btn" onclick="copyToClipboard('correctAddress', this)">Copy Address</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>How it works</h3>
+            <p><strong>Correct Pattern for Paseo Asset Hub:</strong></p>
+            <p>Format: <code>0x + assetId (8 chars) + zeros (24 chars) + 01200000</code></p>
+            <p>The <code>0x12</code> suffix indicates a Trust Backed Asset prefix on Polkadot Hub Testnet.</p>
+            <p><strong>Example:</strong> Asset ID 50000281 → 0x02Faf19900000000000000000000000001200000</p>
+        </div>
+    </div>
+
+    <script>
+        const MAX_U32 = 4294967295;
+        
+        function padHex(num, length) {
+            let hex = num.toString(16);
+            while (hex.length < length) {
+                hex = '0' + hex;
+            }
+            return hex;
+        }
+
+        // EIP-55 checksum encoding using proper Keccak-256
+        function toChecksumAddress(address) {
+            // Remove 0x prefix if present and convert to lowercase
+            const addr = address.toLowerCase().replace('0x', '');
+
+            // Hash the lowercase address using Keccak-256
+            const hash = keccak_256(addr);
+
+            let checksumAddr = '0x';
+            for (let i = 0; i < addr.length; i++) {
+                // If it's a letter (a-f) and the corresponding hash digit is >= 8, uppercase it
+                if (parseInt(hash[i], 16) >= 8) {
+                    checksumAddr += addr[i].toUpperCase();
+                } else {
+                    checksumAddr += addr[i];
+                }
+            }
+
+            return checksumAddr;
+        }
+
+        function assetIdToERC20Address(assetId) {
+            const assetIdHex = padHex(assetId, 8);
+
+            // Pattern for Paseo Asset Hub: assetId (8 chars) + zeros (24 chars) + 01200000
+            const address = '0x' + assetIdHex + '0'.repeat(24) + '01200000';
+
+            // Apply EIP-55 checksum
+            return toChecksumAddress(address);
+        }
+
+        function updateAddresses() {
+            const assetId = parseInt(document.getElementById('assetId').value);
+
+            // Validate: must be a valid number between 0 and u32 max
+            if (isNaN(assetId) || assetId < 0 || assetId > MAX_U32) {
+                document.getElementById('results').classList.add('hidden');
+                return;
+            }
+
+            const address = assetIdToERC20Address(assetId);
+
+            document.getElementById('correctAddress').textContent = address;
+
+            // Reset copy button
+            const copyBtn = document.querySelector('.copy-btn');
+            if (copyBtn) {
+                copyBtn.textContent = 'Copy Address';
+                copyBtn.style.background = '#ffffff';
+            }
+
+            document.getElementById('results').classList.remove('hidden');
+        }
+
+        function copyToClipboard(elementId, btn) {
+            const text = document.getElementById(elementId).textContent;
+
+            navigator.clipboard.writeText(text).then(function() {
+                btn.textContent = 'Copied ✓';
+                btn.style.background = '#666666';
+            }).catch(function(err) {
+                alert('Copy failed. Please select and copy the address manually.');
+            });
+        }
+
+        // Event listener for input changes
+        document.getElementById('assetId').addEventListener('input', updateAddresses);
+
+        // Initial calculation with default value
+        updateAddresses();
+    </script>
+</body>
+</html>
