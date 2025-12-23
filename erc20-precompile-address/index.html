@@ -216,14 +216,14 @@
             <h3>How it works</h3>
             <p><strong>Correct Pattern for Paseo Asset Hub:</strong></p>
             <p>Format: <code>0x + assetId (8 chars) + zeros (24 chars) + 01200000</code></p>
-            <p>The <code>0x12</code> suffix indicates a Trust Backed Asset prefix on Polkadot Hub Testnet.</p>
+            <p>The <code>0x120</code> suffix indicates a Trust Backed Asset prefix on Polkadot Hub Testnet.</p>
             <p><strong>Example:</strong> Asset ID 50000281 → 0x02Faf19900000000000000000000000001200000</p>
         </div>
     </div>
 
     <script>
         const MAX_U32 = 4294967295;
-        
+
         function padHex(num, length) {
             let hex = num.toString(16);
             while (hex.length < length) {
