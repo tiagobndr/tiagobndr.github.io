@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TBT Faucet</title>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>TBT Faucet</h1>
+        <p class="subtitle">Claim your test TBT tokens</p>
+
+        <div id="status" class="status">
+            Connect your wallet to claim TBT tokens
+        </div>
+
+        <div id="account-section" class="account-info hidden">
+            <label>Connected Account</label>
+            <div class="address" id="account-address"></div>
+        </div>
+
+        <button id="connect-btn" class="btn-primary">
+            Connect Wallet
+        </button>
+
+        <button id="claim-btn" class="btn-primary hidden">
+            Claim TBT
+        </button>
+
+        <div class="info-box">
+            <h3>About</h3>
+            <p>This faucet distributes TBT tokens for testing purposes.</p>
+            <p>Contract: <code>0x0Fb083E49a9B7E8dc81B11B673fB983079919fAB</code></p>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
