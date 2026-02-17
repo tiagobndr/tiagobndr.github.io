@@ -2,10 +2,10 @@ import { createClient, Binary } from 'polkadot-api';
 import { getWsProvider } from 'polkadot-api/ws-provider';
 import { getPolkadotSignerFromPjs } from 'polkadot-api/pjs-signer';
 import { getWallets } from '@talismn/connect-wallets';
-import { passetHub } from '@polkadot-api/descriptors';
+import { paseoAssetHub } from '@polkadot-api/descriptors';
 
-const WS_ENDPOINT = 'wss://testnet-passet-hub.polkadot.io';
-const FAUCET_CONTRACT_ADDRESS = '0x0Fb083E49a9B7E8dc81B11B673fB983079919fAB';
+const WS_ENDPOINT = 'wss://sys.ibp.network/asset-hub-paseo';
+const FAUCET_CONTRACT_ADDRESS = '0x2db5f8813509152d4b83f769b5be5c7c0b9c92ed';
 const CLAIM_TBT_SELECTOR = '43beaff2'; // keccak256("claimTbt()")[:4]
 
 let typedApi = null;
@@ -73,7 +73,7 @@ async function connectWallet() {
         setStatus('Connecting to chain...');
         const provider = getWsProvider(WS_ENDPOINT);
         const client = createClient(provider);
-        typedApi = client.getTypedApi(passetHub);
+        typedApi = client.getTypedApi(paseoAssetHub);
 
         setStatus('Waiting for chain connection...');
         await typedApi.query.System.Number.getValue();
@@ -112,8 +112,8 @@ async function claimTBT() {
         const tx = typedApi.tx.Revive.call({
             dest: Binary.fromHex(FAUCET_CONTRACT_ADDRESS),
             value: 0n,
-            weight_limit: weight,
-            storage_deposit_limit: storageDeposit * 2n,
+            weight_limit: { ref_time: weight.ref_time * 100n, proof_size: weight.proof_size * 100n },
+            storage_deposit_limit: storageDeposit > 0n ? storageDeposit * 2n : 10000000000n,
             data: data,
         });
 
